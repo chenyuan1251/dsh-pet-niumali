@@ -899,6 +899,7 @@ addEventListener('keydown', e=>{
   if($fcOvl.classList.contains('on')) return closeFocus();
   if($colOvl.classList.contains('on')) return $colOvl.classList.remove('on');
   if($pcOvl.classList.contains('on')) return closePostcard(false);
+  if($offOvl.classList.contains('on')) return closeOffCheckin();
   if(document.getElementById('jrOvl').classList.contains('on')) return document.getElementById('jrOvl').classList.remove('on');
   if(document.getElementById('hrOvl').classList.contains('on')) return document.getElementById('hrOvl').classList.remove('on');
 });
@@ -906,6 +907,7 @@ document.querySelectorAll('.ovl').forEach(o=>o.addEventListener('mousedown',e=>{
   if(e.target!==o) return;
   if(o===$pcOvl) return closePostcard(false);
   if(o===$fcOvl) return closeFocus();     // 点弹窗外：有进度则结束入账，未开始则直接关闭
+  if(o===$offOvl) return closeOffCheckin();
   o.classList.remove('on');
 }));
 /* ══ 12. 演示模式：连点 3 次左下角版本号 ══ */
@@ -922,9 +924,26 @@ document.getElementById('verTag').addEventListener('click',()=>{
 
 /* ══ v8 ══ 双打卡 + 饲料 + 手帐 ══ */
 
-/* ── 收工防误触：单击只「上膛」，再点一次才真收工 ── */
-let offArmed=false, offArmTimer=0;
-function disarmOffCheckin(){ offArmed=false; clearTimeout(offArmTimer); offArmTimer=0; updateCheckinUI(); }
+/* ── 收工确认弹窗：不再让「收工」是一个说不清后果的单击 ── */
+const $offOvl=document.getElementById('offOvl');
+let offPendingHours=0, offOkTimer=0;
+
+/* 开工时间写成 09:12 */
+function offClockStr(ts){
+  const d=new Date(ts||Date.now());
+  return String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0');
+}
+/* 今天收工能不能接上昨天的闭环（决定连续天数是 +1 还是清零） */
+function closesYesterdayLoop(){
+  return today()!==yesterday() && G.checkin.offDate===yesterday()
+      && G.journal.some(j=>j.date===yesterday());
+}
+/* 按工时挑它的表情：走得早它舍不得，干太久它心疼，正常就开心 */
+function offFaceFor(hours){
+  if(hours<8)  return {key:'pack',  kicker:'今天走得早', note:'它把背包又放下了 —— 要再陪你一会儿吗？'};
+  if(hours>10) return {key:'sorry', kicker:'今天有点长', note:'它没说话，只是把水杯往你那边推了推。'};
+  return {key:'love', kicker:'今天辛苦了', note:'它一直替你数着时间呢。'};
+}
 
 function updateCheckinUI(){
   const btn=document.getElementById('ckBtn');
@@ -933,15 +952,11 @@ function updateCheckinUI(){
     btn.innerHTML='<svg><use href="#i-check"/></svg><span>开工打卡 · 我替你守着</span>';
     btn.onclick=_=>workCheckin();
   }else if(G.checkin.offDate!==today()){
-    if(offArmed){
-      btn.className='ck-btn state-arm';
-      btn.innerHTML='<svg><use href="#i-clock"/></svg><span>再点一次才收工 · 5 秒内有效</span>';
-      btn.onclick=_=>offCheckin();
-    }else{
-      btn.className='ck-btn state-off btn-glass';
-      btn.innerHTML='<svg><use href="#i-check"/></svg><span>收工打卡 · 记工时</span>';
-      btn.onclick=_=>offCheckin();
-    }
+    // 收工按钮原来是不显眼的玻璃底，很多人根本不知道在这儿下班。
+    // 改成和开工同级的实心按钮（配色见 .ck-btn.state-off.btn-gold）。
+    btn.className='ck-btn state-off btn-gold';
+    btn.innerHTML='<svg><use href="#i-clock"/></svg><span>收工打卡 · 看看今天干了多久</span>';
+    btn.onclick=_=>offCheckin();
   }else{
     btn.className='ck-btn state-done';
     btn.innerHTML='<svg><use href="#i-check"/></svg><span>今日已收工 ✓</span>';
@@ -954,8 +969,6 @@ function workCheckin(){
   G.checkin.workDate=today();
   G.checkin.workStart=Date.now();
   G.feed.bag+=3;
-  // 开工时清掉可能残留的收工「上膛」，避免下一次单击直接收工
-  offArmed=false; clearTimeout(offArmTimer); offArmTimer=0;
   save(); bell('chime');
   toast('开工打卡 +3 饲料 🌾 · 开工大吉','i-ticket');
   updateCheckinUI(); stats(); setPanel('已开工','今天预计多少工时？','收工时自动算路费','i-check');
@@ -964,29 +977,55 @@ function workCheckin(){
 function offCheckin(){
   if(G.checkin.offDate===today()) return toast('今日已收工','i-check');
   if(G.checkin.workDate!==today()) return toast('今天还没开工呢','i-clock');
-  // ① 刚开工就「收工」几乎一定是连点误触：开工按钮点完会原地变成收工按钮，
-  //    双击的第二次点击正好落在它上面。直接拦掉，别把一整天的记录烧了。
+  // 刚开工就「收工」几乎一定是连点误触：开工按钮点完会原地变成收工按钮，
+  // 双击的第二次点击正好落在它上面。直接拦掉，别把一整天的记录烧了。
   const elapsedMin=(Date.now()-G.checkin.workStart)/60000;
   if(elapsedMin<1) return toast('才开工不到 1 分钟，先别急着收工','i-clock');
-  // ② 两步确认：第一次点只「上膛」，5 秒内再点一次才真的收工
-  if(!offArmed){
-    offArmed=true;
-    updateCheckinUI();
-    toast('再点一次「收工」才真的收工 · 5 秒内有效','i-clock');
-    clearTimeout(offArmTimer);
-    offArmTimer=setTimeout(disarmOffCheckin, 5000);
-    return;
-  }
-  clearTimeout(offArmTimer); offArmTimer=0; offArmed=false;
   // 自动计算工时：现在 - 上班 - 1小时午休
   const el=elapsedMin/60 - 1;
   const hours=Math.max(0.5, Math.min(16, Math.round(el*2)/2));
+  askOffCheckin(hours);   // 先把工时和它的表情摊开给你看，确认了才真收工
+}
+
+/* ── 收工确认弹窗的开 / 关 ── */
+function askOffCheckin(hours){
+  offPendingHours=hours;
+  const earned=Math.round(hours*10);
+  const f=offFaceFor(hours);
+  const cont=closesYesterdayLoop();
+  document.getElementById('offFace').src=face(f.key);
+  document.getElementById('offKicker').textContent=f.kicker;
+  document.getElementById('offHours').textContent=hours.toFixed(1);
+  document.getElementById('offSub').textContent=f.note;
+  document.getElementById('offStart').textContent=offClockStr(G.checkin.workStart);
+  document.getElementById('offEarn').textContent='+'+earned+' 路费';
+  document.getElementById('offStreak').textContent=(cont? G.checkin.streak+1 : 1)+' 天';
+  document.getElementById('offNote').textContent=cont
+    ? '确认后它会记一页手帐，连续天数接着往上走'
+    : '确认后它会记一页手帐，并从今天重新数连续天数';
+  // 防连点：弹窗出来后 400ms 才让确认键可点，双击的第二下不会直接落上去
+  const ok=document.getElementById('offOk');
+  ok.disabled=true;
+  clearTimeout(offOkTimer);
+  offOkTimer=setTimeout(()=>{ ok.disabled=false; },400);
+  $offOvl.classList.add('on');
+}
+function closeOffCheckin(){
+  clearTimeout(offOkTimer); offOkTimer=0;
+  $offOvl.classList.remove('on');
+}
+function commitOffCheckin(){
+  const hours=offPendingHours;
+  closeOffCheckin();
   confirmOffCheckin(hours);
 }
+document.getElementById('offOk').addEventListener('click', commitOffCheckin);
+document.getElementById('offCancel').addEventListener('click', closeOffCheckin);
+document.getElementById('offX').addEventListener('click', closeOffCheckin);
 
 function confirmOffCheckin(hours){
   // ⚡ 先检查昨天是否闭环（此时 offDate 还是昨天的值）
-  const completed=today()!==yesterday() && G.checkin.offDate===yesterday() && G.journal.some(j=>j.date===yesterday());
+  const completed=closesYesterdayLoop();
   G.checkin.offDate=today();
   G.checkin.hours=hours;
   const earned=Math.round(hours*10);

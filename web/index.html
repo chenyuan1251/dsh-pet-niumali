@@ -344,6 +344,27 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Hira
   </div>
 </div>
 
+<!-- ══ 收工确认：把「今天干了多久」摆到台面上，顺便让它露个表情 ══ -->
+<div class="ovl" id="offOvl" role="dialog" aria-modal="true" aria-labelledby="offKicker">
+  <div class="off-card">
+    <button class="x-btn" id="offX" aria-label="先不收工"><svg><use href="#i-x"/></svg></button>
+    <img class="off-face" id="offFace" src="assets/images/小牛表情包_开心微笑.jpg" alt="">
+    <div class="off-kicker" id="offKicker">今天辛苦了</div>
+    <div class="off-hours"><b id="offHours">0</b><span>小时</span></div>
+    <div class="off-sub" id="offSub">按你的开工时间算，午休 1 小时已经扣掉了</div>
+    <div class="off-rows">
+      <div class="off-row"><span>开工时间</span><b id="offStart">--:--</b></div>
+      <div class="off-row"><span>本次路费</span><b id="offEarn">+0</b></div>
+      <div class="off-row"><span>连续天数</span><b id="offStreak">0 天</b></div>
+    </div>
+    <div class="off-note" id="offNote">确认后它会记一页手帐</div>
+    <div class="off-acts">
+      <button class="btn btn-glass" id="offCancel">再干一会儿</button>
+      <button class="btn btn-gold" id="offOk" disabled>确认收工</button>
+    </div>
+  </div>
+</div>
+
 <script src="./assets/app.js"></script>
 <script src="./desktop-pet-bridge.js"></script>
 </body></html>
