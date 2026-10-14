@@ -1,0 +1,5 @@
+# dsh-pet-niumali bundle patch
+# 将牛马力桌宠插件注册到当前 DSH profile 的服务栈中。
+- insert:
+    - id: dsh-pet-niumali
+      name: dsh-pet-niumali

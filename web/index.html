@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<title>牛马力 · 替你活</title>
+<style>*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}html,body{height:100%}
+body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;-webkit-font-smoothing:antialiased;-webkit-tap-highlight-color:transparent;-webkit-user-select:none;user-select:none}
+</style>
+<link rel="stylesheet" href="./assets/style.css">
+</head>
+<body draggable="false">
+
+<!-- ══ SVG 图标库（统一线条，替换全部 emoji：跨系统渲染一致，符合"像同一个人画的"美术红线） ══ -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+<linearGradient id="fcGrad" x1="0" y1="0" x2="1" y2="1">
+  <stop offset="0%" stop-color="#C9A84C"/><stop offset="60%" stop-color="#D4866F"/><stop offset="100%" stop-color="#8FBCA8"/>
+</linearGradient>
+<g id="sp" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+  <symbol id="i-bell" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8a6 6 0 1 0-12 0c0 7-3 8-3 8h18s-3-1-3-8"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></g></symbol>
+  <symbol id="i-brief" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="2.5" y="7" width="19" height="13" rx="2.5"/><path d="M8.5 7V5.5A1.5 1.5 0 0 1 10 4h4a1.5 1.5 0 0 1 1.5 1.5V7M2.5 12.5h19"/></g></symbol>
+  <symbol id="i-compass" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="m15.5 8.5-2 5-5 2 2-5z"/></g></symbol>
+  <symbol id="i-train" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="3" width="14" height="13" rx="3"/><path d="M5 10h14M8.5 19.5 6 22M15.5 19.5 18 22M4 16h16"/><circle cx="9" cy="13" r=".6" fill="currentColor"/><circle cx="15" cy="13" r=".6" fill="currentColor"/></g></symbol>
+  <symbol id="i-pin" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s7-5.6 7-11a7 7 0 1 0-14 0c0 5.4 7 11 7 11z"/><circle cx="12" cy="10" r="2.6"/></g></symbol>
+  <symbol id="i-ticket" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9V7a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v2a2.5 2.5 0 0 0 0 5v2a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-2a2.5 2.5 0 0 0 0-5z"/><path d="M13 5v14" stroke-dasharray="2 2.5"/></g></symbol>
+  <symbol id="i-heart" viewBox="0 0 24 24"><path d="M12 20.3 4.6 13a4.6 4.6 0 0 1 6.5-6.5l.9.9.9-.9A4.6 4.6 0 0 1 19.4 13z" fill="currentColor" stroke="none"/></symbol>
+  <symbol id="i-mail" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="2.5" y="5" width="19" height="14" rx="2.5"/><path d="m3.5 7 8.5 6 8.5-6"/></g></symbol>
+  <symbol id="i-x" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"/></g></symbol>
+  <symbol id="i-play" viewBox="0 0 24 24"><path d="M8 5.5v13l11-6.5z" fill="currentColor" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/></symbol>
+  <symbol id="i-pause" viewBox="0 0 24 24"><g fill="currentColor"><rect x="7" y="5.5" width="3.6" height="13" rx="1.2"/><rect x="13.4" y="5.5" width="3.6" height="13" rx="1.2"/></g></symbol>
+  <symbol id="i-reset" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 12a8.5 8.5 0 1 0 2.6-6.1"/><path d="M3.5 4.5V10H9"/></g></symbol>
+  <symbol id="i-sound" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5 6.5 8.5H3.5v7h3L11 19z"/><path d="M15.5 9.2a4 4 0 0 1 0 5.6M18.3 6.4a8 8 0 0 1 0 11.2"/></g></symbol>
+  <symbol id="i-mute" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5 6.5 8.5H3.5v7h3L11 19z"/><path d="m16 9.5 5 5M21 9.5l-5 5"/></g></symbol>
+  <symbol id="i-spark" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3.5 13.8 9 19 10.8 13.8 12.6 12 18 10.2 12.6 5 10.8 10.2 9z"/><path d="M18.5 16.5 19.2 18.6 21 19.3 19.2 20 18.5 22 17.8 20 16 19.3 17.8 18.6z"/></g></symbol>
+  <symbol id="i-book" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4.5h6a3 3 0 0 1 3 3V20a2.5 2.5 0 0 0-2.5-2.5H4z"/><path d="M20 4.5h-6a3 3 0 0 0-3 3V20a2.5 2.5 0 0 1 2.5-2.5H20z"/></g></symbol>
+  <symbol id="i-paw" viewBox="0 0 24 24"><g fill="currentColor" stroke="none"><ellipse cx="7" cy="9" rx="2.1" ry="2.7"/><ellipse cx="12" cy="7.2" rx="2.1" ry="2.8"/><ellipse cx="17" cy="9" rx="2.1" ry="2.7"/><path d="M12 12.2c3 0 5.4 2.3 5.4 4.6 0 1.8-1.6 2.7-3.3 2.2-1.4-.4-2.8-.4-4.2 0-1.7.5-3.3-.4-3.3-2.2 0-2.3 2.4-4.6 5.4-4.6z"/></g></symbol>
+  <symbol id="i-clock" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8.8"/><path d="M12 7v5.3l3.4 2"/></g></symbol>
+  <symbol id="i-check" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M5 13l4 4 10-10"/></g></symbol>
+  <symbol id="i-bowl" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M7 15.5A5.5 5.5 0 0 0 17 15.5M3.5 13h17M12 3.5v3M9 5l1 2M15 5l-1 2"/></g></symbol>
+  <symbol id="i-streak" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3.5C7 9 5 13 5 16a7 7 0 0 0 14 0c0-3-2-7-7-12.5z"/></g></symbol>
+  <symbol id="i-prev" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></g></symbol>
+  <symbol id="i-search" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="10.5" cy="10.5" r="6.5"/><path d="M15.5 15.5L21 21"/></g></symbol>
+  <symbol id="i-next" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5l7 7-7 7"/></g></symbol>
+  <!-- 手帐涂鸦 -->
+  <symbol id="doodle-0" viewBox="0 0 40 40"><path d="M10 20 Q20 5 30 20 Q20 35 10 20" fill="none" stroke="currentColor" stroke-width="1.8"/></symbol>
+  <symbol id="doodle-1" viewBox="0 0 40 40"><circle cx="20" cy="15" r="4" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M16 15 L24 15 M20 19 L20 30 M15 25 L25 25" stroke="currentColor" stroke-width="1.8"/></symbol>
+  <symbol id="doodle-2" viewBox="0 0 40 40"><path d="M5 20 Q10 8 20 15 Q30 8 35 20" fill="none" stroke="currentColor" stroke-width="1.8"/></symbol>
+  <symbol id="doodle-3" viewBox="0 0 40 40"><path d="M10 28 Q15 10 20 20 Q25 10 30 28" fill="none" stroke="currentColor" stroke-width="1.8"/></symbol>
+  <symbol id="doodle-4" viewBox="0 0 40 40"><path d="M8 32 L20 5 L32 32" fill="none" stroke="currentColor" stroke-width="1.8"/></symbol>
+  <symbol id="doodle-5" viewBox="0 0 40 40"><circle cx="20" cy="20" r="8" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M12 20 L28 20" stroke="currentColor" stroke-width="1.8"/></symbol>
+  <symbol id="doodle-6" viewBox="0 0 40 40"><path d="M20 8 Q32 12 28 20 Q32 28 20 32 Q8 28 12 20 Q8 12 20 8" fill="none" stroke="currentColor" stroke-width="1.4"/></symbol>
+  <symbol id="doodle-7" viewBox="0 0 40 40"><path d="M12 15 L12 30 M28 15 L28 30" stroke="currentColor" stroke-width="1.8"/><path d="M8 30 Q20 35 32 30" stroke="currentColor" stroke-width="1.8" fill="none"/></symbol>
+  <symbol id="doodle-8" viewBox="0 0 40 40"><path d="M12 10 Q20 5 28 10 Q32 15 28 20 Q20 15 12 20 Q8 15 12 10" fill="none" stroke="currentColor" stroke-width="1.4"/></symbol>
+  <symbol id="doodle-9" viewBox="0 0 40 40"><path d="M10 15 Q15 5 20 10 Q25 5 30 15" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M10 28 Q15 20 20 25 Q25 20 30 28" fill="none" stroke="currentColor" stroke-width="1.8"/></symbol>
+</g>
+</defs></svg>
+
+<!-- ══ 背景层 ══ -->
+<div class="bg on" id="bgDesk">
+  <img id="imgDesk" src="assets/images/小牛办公工位手机竖屏图.jpg" alt="工位">
+  <div class="veil"></div>
+</div>
+<div class="bg" id="bgTravel">
+  <img id="imgTravel" src="assets/images/空工位手机壁纸出门旅行.jpg" alt="在路上" loading="lazy">
+  <div class="veil"></div>
+</div>
+<div class="grain"></div>
+<div class="flash" id="flash"></div>
+
+<!-- ══ 顶部 HUD ══ -->
+<header class="hud">
+  <div class="scene-tag" id="sceneTag" role="status" aria-live="polite">
+    <svg class="ic"><use href="#i-brief"/></svg>
+    <span class="dot"></span>
+    <span id="sceneLbl">在工位 · 默默搬砖</span>
+  </div>
+  <div class="hud-btns">
+    <button class="icon-btn" id="soundBtn" aria-pressed="true" title="铃铛声音">
+      <svg><use href="#i-sound" id="soundIc"/></svg>
+    </button>
+  </div>
+</header>
+
+<!-- ══ 舞台 ══ -->
+<main class="stage" id="stage">
+
+  <div class="portrait" id="portrait">
+    <div class="p-ring" id="pRing"><img id="charImg" draggable="false" src="assets/images/小牛表情包_开心微笑.jpg" alt="牛马力"></div>
+    <div class="p-empty" aria-hidden="true">
+      <svg><use href="#i-bell"/></svg>
+      <span>它不在</span>
+    </div>
+    <!-- 提示气泡（v7：按住抚摸） -->
+    <svg class="pet-ring" id="petRing" viewBox="0 0 100 100" aria-hidden="true"><circle cx="50" cy="50" r="47"/></svg>
+    <div class="pet-combo" id="petCombo" aria-hidden="true"></div>
+    <button class="p-hint" id="tapHint" style="border:0">按住头像来回抚摸 · 攒路费</button>
+  </div>
+
+  <h1 class="wordmark">牛马力</h1>
+
+  <p class="mood">
+    <span id="moodText">正在收拾背包</span>
+    <span class="hearts" id="hearts" aria-label="心情 3 / 5"></span>
+    <b class="mood-num" id="moodNum" title="心情值，摸一次头 +0.25">3.00</b>
+  </p>
+
+  <nav class="stats" aria-label="数据">
+    <div class="stats-row">
+      <div class="stat" id="statCheckin"><svg><use href="#i-streak"/></svg><b>0</b>天连续</div>
+      <div class="stat" id="statFocus"><svg><use href="#i-clock"/></svg><b>0</b>专注分钟</div>
+      <div class="stat" id="statTodo"><svg><use href="#i-check"/></svg><b>0</b>待办</div>
+    </div>
+    <div class="stats-row">
+      <div class="stat" id="statTrips"><svg><use href="#i-train"/></svg><b>0</b>旅行</div>
+      <div class="stat" id="statCities"><svg><use href="#i-pin"/></svg><b>0</b>城市</div>
+      <div class="stat" id="statJournal"><svg><use href="#i-book"/></svg><b>0</b>手帐</div>
+      <div class="stat" id="statHuntAlbum"><svg><use href="#i-search"/></svg><b>0</b>探宝</div>
+    </div>
+  </nav>
+
+  <!-- ══ 打卡 + 饲料条 ══ -->
+  <div class="checkin-row" id="checkinRow">
+    <button class="ck-btn btn-gold" id="ckBtn">
+      <svg><use href="#i-check"/></svg>
+      <span>开工打卡 · 我替你守着</span>
+    </button>
+    <button class="feed-btn" id="feedBtn" title="喂饲料 — 它吃饱了，路费回你账上">
+      <svg><use href="#i-bowl"/></svg>
+      <span class="feed-badge" id="feedCount">0</span>
+      <span class="feed-lbl">饲料</span>
+    </button>
+  </div>
+  <div class="streak-line" id="streakLine">已连续开工 <b id="streakNum">0</b> 天</div>
+
+  <section class="panel" id="panel" aria-live="polite">
+    <div class="panel-row">
+      <div>
+        <div class="p-kicker"><svg><use href="#i-spark"/></svg><span id="pKicker">牛马力正在待命</span></div>
+        <div class="p-title" id="pTitle">摸摸头攒路费</div>
+        <div class="p-sub" id="pSub">攒够 100 路费，就能送它出发</div>
+      </div>
+      <div class="p-fare" id="fareBox"><b id="stFare">100</b><span>路费</span></div>
+    </div>
+    <div class="journey" id="journey">
+      <div class="j-head"><span>途经</span><em id="jCity">—</em></div>
+      <div class="track" id="track">
+        <div class="fill" id="trackFill"></div>
+        <div class="train" id="trainIcon"><svg><use href="#i-train"/></svg></div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<!-- ══ 专注徽章（暂停后可收起到右下角，计时中不可收起） ══ -->
+<button class="focus-badge" id="focusBadge" aria-label="返回番茄钟">
+  <span class="fb-ring">
+    <svg viewBox="0 0 36 36"><circle class="bgc" cx="18" cy="18" r="15.5"/><circle class="fgc" id="fbArc" cx="18" cy="18" r="15.5" stroke-dasharray="97.4" stroke-dashoffset="97.4"/></svg>
+    <span class="fb-t" id="fbPct">0%</span>
+  </span>
+  <span class="fb-txt"><b id="fbTime">25:00</b><span id="fbLbl">已暂停 · 点我继续</span></span>
+</button>
+
+<!-- ══ 弧形菜单 ══ -->
+<!-- 弧形菜单（v7 移除：改为数值条直通各功能） -->
+
+<!-- ══ 路过的碎片 ══ -->
+<div class="peek" id="peek" aria-hidden="true"><img id="peekImg" alt=""><p id="peekTxt"></p></div>
+
+<!-- ══ 明信片 ══ -->
+<div class="ovl" id="pcOvl" role="dialog" aria-modal="true" aria-label="明信片">
+  <div class="pc-scene sheet" style="overflow:visible">
+    <div class="pc-card" id="pcCard">
+      <button class="x-btn" id="pcX" style="color:rgba(42,31,20,.45)" aria-label="关闭"><svg><use href="#i-x"/></svg></button>
+      <div class="pc-stamp" id="pcStamp"><svg><use href="#i-compass"/></svg></div>
+      <div class="pc-postmark" id="pcMark">牛马力<br>寄</div>
+      <div class="pc-city"><span id="pcCity">大理</span><i id="pcIdx">第 1 站</i></div>
+      <div class="pc-illus"><img id="pcImg" alt=""><span class="cap" id="pcCap"></span></div>
+      <p class="pc-f1" id="pcF1"></p>
+      <p class="pc-f2" id="pcF2"></p>
+      <div class="pc-acts" id="pcActs">
+        <button class="btn btn-gold" id="pcKeep"><svg><use href="#i-mail"/></svg>收进册子</button>
+        <button class="btn btn-ghost" id="pcLater">待会儿再看</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ 收集册：真明信片墙 ══ -->
+<div class="ovl" id="colOvl" role="dialog" aria-modal="true" aria-label="明信片收集册">
+  <div class="col-sheet sheet">
+    <button class="x-btn" id="colX" aria-label="关闭"><svg><use href="#i-x"/></svg></button>
+    <div class="sheet-title">明信片收集册</div>
+    <div class="col-sub">已集 <b id="colCount">0</b> / 10 座城 · 这是你以后要亲自去的地方</div>
+    <div class="col-grid" id="colGrid"></div>
+    <div class="col-foot"><button class="btn btn-glass" id="colClose">关闭</button></div>
+  </div>
+</div>
+
+<!-- ══ 番茄钟 ══ -->
+<div class="ovl" id="fcOvl" role="dialog" aria-modal="true" aria-label="番茄专注">
+  <div class="fc-sheet sheet">
+    <button class="end-btn" id="fcX" title="关闭面板，计时继续" aria-label="关闭"><svg><use href="#i-x"/></svg></button>
+    <div class="sheet-title">番茄专注</div>
+    <div class="fc-dial">
+      <svg viewBox="0 0 120 120"><circle class="bgc" cx="60" cy="60" r="54"/><circle class="fgc" id="fcArc" cx="60" cy="60" r="54" stroke-dasharray="339.3" stroke-dashoffset="0"/></svg>
+      <div class="fc-mid"><div class="fc-time" id="fcTime">25:00</div><div class="fc-of" id="fcOf">/ 25 分钟</div></div>
+    </div>
+    <img class="fc-cow" id="fcCow" src="assets/images/小牛撒娇表情包.jpg" alt="牛马力在收拾背包">
+    <div class="fc-line" id="fcLine">你专注 1 分钟，它就走 1 分钟的路。</div>
+    <div class="fc-earn">本次已攒 <b id="fcEarn">0</b> 路费 · 今日 <b id="fcSess">0</b> 次</div>
+    <div class="fc-acts">
+      <button class="btn btn-gold" id="fcBtn"><svg><use href="#i-play"/></svg><span>开始专注</span></button>
+      <button class="btn btn-ghost" id="fcEnd" title="结束本次专注，已专注的分钟换算路费入账"
+              style="border-color:rgba(255,246,230,.18);color:var(--t2);font-size:.72rem;padding:0 .7rem"><span>结束</span></button>
+    </div>
+    <div class="fc-note">
+      <b>暂停中</b> / 点弹窗外 / Esc = 缩到右下角，<b>计时保持暂停</b>
+    </div>
+  </div>
+</div>
+
+<!-- ══ 工时确认卡 ══ -->
+
+
+<!-- ══ 手帐弹窗 ══ -->
+<div class="ovl" id="jrOvl" role="dialog" aria-modal="true" aria-label="手帐">
+  <div class="jr-sheet sheet">
+    <button class="x-btn" id="jrX" aria-label="关闭"><svg><use href="#i-x"/></svg></button>
+    <div class="jr-nav">
+      <button class="jr-arrow" id="jrPrev" title="上个月"><svg><use href="#i-prev"/></svg></button>
+      <span class="jr-month" id="jrMonth">2026年9月</span>
+      <span class="jr-spacer"></span>
+    </div>
+    <div class="jr-body" id="jrBody"></div>
+  </div>
+</div>
+
+<!-- ══ 翻页动画 ══ -->
+<div class="jr-turn" id="jrTurn">
+  <img class="jr-turn-img" id="jrTurnImg" src="" alt="">
+</div>
+
+<!-- ══ 首次引导 ══ -->
+<div class="guide" id="guide" role="dialog" aria-modal="true" aria-label="开始">
+  <div class="guide-card">
+    <h2>你上班，它替你活</h2>
+    <p>这是<b>牛马力</b>。你在工位专注，它就攒够路费替你出门，<br>回来寄一张明信片给你。</p>
+    <p style="margin-top:.5rem;font-size:.76rem;color:var(--t3)">每天先<b>开工打卡</b>，再专注攒路费。<br>攒路费的主力是<b>专注</b>（25 分钟 = 25 路费）。<br>零花钱：<b>按住头像来回抚摸</b>，每次 +1 路费，<b>每日前 30 次有效</b>。</p>
+    <div class="guide-steps">
+      <div><svg><use href="#i-check"/></svg><span>开工打卡</span></div>
+      <div><svg><use href="#i-clock"/></svg><span>专注攒路费</span></div>
+      <div><svg><use href="#i-train"/></svg><span>送它出发</span></div>
+      <div><svg><use href="#i-mail"/></svg><span>收明信片</span></div>
+    </div>
+    <button class="btn btn-gold" id="guideGo" style="width:100%;justify-content:center">知道了，开工红包已到账</button>
+  </div>
+</div>
+
+<!-- ══ 今日求签 ══ -->
+<div class="ovl frt-ovl" id="frtOvl" role="dialog" aria-modal="true" aria-label="今日求签">
+  <div class="frt-card" id="frtCard">
+    <div class="frt-head">
+      <span class="frt-title">🏮 今日求签</span>
+      <button class="x-btn" id="frtX" aria-label="关闭"><svg><use href="#i-x"/></svg></button>
+    </div>
+    <div class="frt-body" id="frtBody">
+      <div class="frt-q" id="frtQ">
+        <img class="frt-q-img" src="assets/images/灵隐寺签筒去除文字纯净版.jpg" alt="签筒">
+        <p class="frt-tap-hint">点一下摇签</p>
+      </div>
+      <div class="frt-r hidden" id="frtR">
+        <div class="frt-r-left"><img class="frt-face" id="frtFace" src="" alt=""></div>
+        <div class="frt-r-right">
+          <div class="frt-name" id="frtName">上上签</div>
+          <div class="frt-desc" id="frtDesc">好运正在路上</div>
+          <div class="frt-desc2" id="frtDesc2">+30 路费</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ 掷圣杯 ══ -->
+<div class="ovl mb-ovl" id="mbOvl" role="dialog" aria-modal="true" aria-label="掷圣杯">
+  <div class="mb-card" id="mbCard">
+    <div class="mb-head">
+      <span class="mb-title">🙏 掷圣杯</span>
+      <button class="x-btn" id="mbX" aria-label="关闭"><svg><use href="#i-x"/></svg></button>
+    </div>
+    <div class="mb-body">
+      <div class="mb-reward hidden" id="mbReward"><span id="mbRewardTxt"></span></div>
+      <img class="mb-img" id="mbImg" src="" alt="掷圣杯">
+      <button class="mb-btn" id="mbBtn" onclick="throwMoonBlocks()">🙏 掷圣杯</button>
+      <div class="mb-res hidden" id="mbRes">
+        <span class="mb-name" id="mbName">圣杯</span>
+        <span class="mb-desc" id="mbDesc">两面平整 · 诸事大吉 +30 路费</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="toasts" id="toasts"></div>
+
+<!-- ══ 摸鱼探宝 ══ -->
+<div class="ovl hunt-ovl" id="huntOvl" role="dialog" aria-modal="true" aria-label="摸鱼探宝">
+  <div class="hunt-card" id="huntCard">
+    <button class="hunt-close" id="huntClose" aria-label="关闭"><svg><use href="#i-x"/></svg></button>
+    <div class="hunt-tier" id="huntTier">🟢 普通</div>
+    <img class="hunt-img" id="huntImg" src="" alt="">
+    <div class="hunt-body">
+      <div class="hunt-story" id="huntStory">小牛叼回来一张便利贴</div>
+      <div class="hunt-reward" id="huntReward">+10 路费</div>
+      <div class="hunt-discover" id="huntDiscover">
+        <span class="hunt-disc-label">小牛溜达了一圈</span>
+        <span class="hunt-disc-val">回来了</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="tag-ver" id="verTag" title="连点 3 次进入演示模式">牛马力 · v8 · 双打卡生活闭环</div>
+
+<!-- ══ 探宝手册 ══ -->
+<div class="ovl" id="haOvl" role="dialog" aria-modal="true" aria-label="摸鱼探宝手册">
+  <div class="ha-sheet" id="haSheet">
+    <div class="ha-head"><span class="ha-title">🔍 摸鱼探宝手册</span><button class="ha-close" id="haClose"><svg><use href="#i-x"/></svg></button></div>
+    <div class="ha-body" id="haBody"></div>
+  </div>
+</div>
+
+<!-- ══ 待办清单 ══ -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="i-checklist" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5H4a1 1 0 0 0-1 1v14a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-5"/><path d="M9 12l2 2 4-4"/><path d="M16 4l3 3 5-5M12 11l2 2 4-4" stroke-dasharray="2 1.5"/></g></symbol>
+</svg>
+<div class="ovl" id="tdOvl" role="dialog" aria-modal="true" aria-label="待办清单">
+  <div class="td-sheet sheet">
+    <div class="td-head"><span class="sheet-title">☑️ 今日待办</span><button class="x-btn" id="tdX"><svg><use href="#i-x"/></svg></button></div>
+    <div class="td-sub" id="tdSub">0 / 0 已完成</div>
+    <div class="td-body" id="tdBody"></div>
+    <div class="td-foot">
+      <input class="td-input" id="tdInput" placeholder="添加待办…" maxlength="60">
+      <button class="td-add" id="tdAdd">添加</button>
+    </div>
+  </div>
+</div>
+
+<script src="./assets/app.js"></script>
+<script src="./desktop-pet-bridge.js"></script>
+</body></html>

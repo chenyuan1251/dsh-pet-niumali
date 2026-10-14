@@ -1,0 +1,73 @@
+{
+  "name": "dsh-pet-niumali",
+  "version": "8.0.0",
+  "description": "牛马力 v8：DSH 界面里的常驻桌宠浮球，点开是开工/收工打卡、专注计时、待办、手帐、旅行与探宝的生活闭环。",
+  "type": "module",
+  "main": "index.mjs",
+  "license": "MIT",
+  "author": "chenyuan1251",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/chenyuan1251/dsh-pet-niumali.git"
+  },
+  "homepage": "https://github.com/chenyuan1251/dsh-pet-niumali#readme",
+  "bugs": {
+    "url": "https://github.com/chenyuan1251/dsh-pet-niumali/issues"
+  },
+  "keywords": [
+    "deepseek",
+    "dsh",
+    "dsh-plugin",
+    "desktop-pet",
+    "cordis",
+    "niumali"
+  ],
+  "exports": {
+    ".": "./index.mjs",
+    "./client": "./client.js",
+    "./cordis.patch.yml": "./cordis.patch.yml",
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "index.mjs",
+    "client.js",
+    "cordis.patch.yml",
+    "web",
+    "electron",
+    "README.md",
+    "LICENSE"
+  ],
+  "dsh": {
+    "bundle": {
+      "patch": "./cordis.patch.yml"
+    },
+    "client": {
+      "platform": "web",
+      "inject": [
+        "@deepseek-ai/dsh-client-ui-theme"
+      ]
+    },
+    "compatibility": {
+      "dsh": ">=0.1.5-rc.1 <0.2.0-0 || >=0.2.0-rc.1 <0.3.0-0",
+      "profiles": [
+        "web",
+        "desktop"
+      ]
+    }
+  },
+  "scripts": {
+    "start": "electron electron/main.mjs"
+  },
+  "engines": {
+    "node": ">=22",
+    "dsh": ">=0.1.5-rc.1 <0.2.0-0 || >=0.2.0-rc.1 <0.3.0-0"
+  },
+  "peerDependencies": {
+    "react": "^18.0.0 || ^19.0.0",
+    "@deepseek-ai/cordis": "^4.0.0",
+    "@deepseek-ai/dsh-client-ui-theme": "^0.1.0-rc.6 || ^0.2.0-rc.2"
+  },
+  "devDependencies": {
+    "electron": "^33.0.0"
+  }
+}
