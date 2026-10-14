@@ -313,7 +313,8 @@ function stats(){
   set('#statFocus b', G.focusMin);
   set('#statJournal b', G.journal.length);
   set('#statHuntAlbum b', (G.huntLoot||[]).length);
-  set('#statTodo b', (G.todos||[]).filter(t=>!t.done).length);
+  // 与待办面板同一口径：未完成的全部计入（含从昨天顺延下来的）
+  set('#statTodo b', visibleTodos().filter(t=>!t.done).length);
   set('#stFare', Math.floor(G.fare));
   document.getElementById('fareBox').classList.toggle('full', G.fare>=TRAVEL_COST);
   set('#streakNum', G.checkin.streak);
@@ -1172,23 +1173,34 @@ function closeHuntAlbum(){ $haOvl.classList.remove('on'); }
 function escHtml(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
 
 /* ── 待办清单 ── */
+/* 「今日待办」的口径：未完成的自动顺延到明天，往日已完成的收起。
+   所以可见 = 今天建的 + 从以前顺延下来的未完成 + 今天刚划掉的。
+   createdAt 只用来标「顺延」，不作为隐藏条件——否则没做完的事会凭空消失。 */
+function visibleTodos(){
+  return (G.todos||[]).filter(t=>!t.done || t.completedAt===today());
+}
 function renderTodoList(){
-  const todos=G.todos||[];
+  const all=G.todos||[];
+  const todos=visibleTodos();
   const done=todos.filter(t=>t.done).length;
+  const body=document.getElementById('tdBody');
   document.getElementById('tdSub').textContent=done+' / '+todos.length+' 已完成';
   if(!todos.length){
-    document.getElementById('tdBody').innerHTML='<div class="td-empty">还没有待办<br><span class="td-tag">在下方输入添加</span></div>';
+    body.innerHTML='<div class="td-empty">'+(all.length
+      ? '今天的都清空了<br><span class="td-tag">往日完成的已收起来</span>'
+      : '还没有待办<br><span class="td-tag">在下方输入添加</span>')+'</div>';
     return;
   }
-  document.getElementById('tdBody').innerHTML=todos.map(t=>
-    '<div class="td-item" data-id="'+t.id+'">'+
+  body.innerHTML=todos.map(t=>{
+    const carried=!t.done && !!t.createdAt && t.createdAt!==today();
+    return '<div class="td-item" data-id="'+t.id+'">'+
       '<div class="td-check'+(t.done?' done':'')+'" data-act="toggle"></div>'+
       '<span class="td-text'+(t.done?' done':'')+'">'+escHtml(t.text)+'</span>'+
+      (carried?'<span class="td-tag td-carry">顺延</span>':'')+
       '<button class="td-del" data-act="del">✕</button>'+
-    '</div>'
-  ).join('');
+    '</div>';
+  }).join('');
   // 事件委托
-  const body=document.getElementById('tdBody');
   body.onclick=function(e){
     const item=e.target.closest('.td-item');
     if(!item) return;

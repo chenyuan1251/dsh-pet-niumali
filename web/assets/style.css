@@ -792,5 +792,7 @@ img{-webkit-user-drag:none;user-select:none;-webkit-user-select:none}
   cursor:pointer;border-radius:50%;display:flex;align-items:center;justify-content:center}
 .td-del:hover{background:rgba(255,80,80,.12);color:#e55}
 .td-tag{font-size:.6rem;color:var(--t3);margin-left:.3rem}
+.td-carry{font-size:.56rem;color:var(--gold-lit);border:1px solid var(--brd);border-radius:999px;
+  padding:.05rem .34rem;margin-left:0;letter-spacing:.08em;background:rgba(201,168,76,.10);flex:none}
 
 
