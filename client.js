@@ -530,18 +530,6 @@ window.__ModuleLoader__.load({
             : null,
           React.createElement("span", { className: "nml-spacer" }),
           React.createElement(
-            "a",
-            {
-              className: "nml-btn",
-              href: PET_PAGE,
-              target: "_blank",
-              rel: "noreferrer",
-              title: "在新标签页打开",
-              onPointerDown: (e) => e.stopPropagation(),
-            },
-            "↗",
-          ),
-          React.createElement(
             "button",
             {
               type: "button",
