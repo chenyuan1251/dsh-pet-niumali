@@ -123,6 +123,9 @@ window.__ModuleLoader__.load({
 }
 .nml-btn:hover{background:var(--dsw-alias-interactive-bg-hover,rgba(127,127,127,.14));color:var(--dsw-alias-label-primary,currentColor)}
 .nml-btn.nml-close:hover{background:rgba(220,80,80,.9);color:#fff}
+/* 📌 把手：光标跟着标题栏一起变，别让 pointer 光标误导人以为这儿只能点 */
+.nml-btn.nml-pin{cursor:grab;font-size:12px}
+.nml-head.nml-dragging .nml-btn.nml-pin{cursor:grabbing}
 .nml-body{flex:1 1 auto;min-height:0;background:var(--dsw-alias-bg-base,#fff)}
 .nml-frame{width:100%;height:100%;border:0;display:block}
 /* 关掉但保持挂载时只隐藏，不打碎 iframe —— 桌宠的专注计时不能因为收起浮窗就断掉 */
@@ -529,6 +532,15 @@ window.__ModuleLoader__.load({
             ? React.createElement("span", { className: "nml-chip" }, "连续 " + streak + " 天")
             : null,
           React.createElement("span", { className: "nml-spacer" }),
+          // 📌 是浮窗的「把手」：按住它（或标题栏任意空白处）就能拖动浮窗。
+          // 这里刻意不 stopPropagation —— 它本身就是拖动区的一部分。
+          // 老版本把它做成了一个 <a href target="_blank"> 的 ↗：在 DSH 桌面端
+          // 新窗口请求没人接管，点了没反应，还让人以为这一块不能拖。
+          React.createElement(
+            "span",
+            { className: "nml-btn nml-pin", title: "按住这里拖动浮窗" },
+            "📌",
+          ),
           React.createElement(
             "button",
             {
