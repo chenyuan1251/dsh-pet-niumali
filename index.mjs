@@ -79,13 +79,14 @@ export function apply(ctx) {
         }
 
         const type = mimeFor(file);
+        // Code must never go stale: an app.js cached for a day outlives the fix you
+        // just shipped, and the user keeps running the old one. Only genuinely
+        // immutable binaries (artwork, fonts) get a long cache.
+        const immutable = type.startsWith("image/") || type.startsWith("font/");
         res.writeHead(200, {
           "content-type": type,
           "content-length": stat.size,
-          // Keep the shell fresh but let the artwork be cached hard.
-          "cache-control": type.startsWith("text/html")
-            ? "no-cache"
-            : "public, max-age=86400",
+          "cache-control": immutable ? "public, max-age=86400" : "no-cache",
         });
         createReadStream(file).pipe(res);
       },

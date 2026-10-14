@@ -539,6 +539,13 @@ img{-webkit-user-drag:none;user-select:none;-webkit-user-select:none}
 .ck-btn.disabled{opacity:.45;pointer-events:none}
 .ck-btn.state-work.btn-gold{background:var(--gold);color:var(--ink-deep)}
 .ck-btn.state-off.btn-glass{background:var(--glass-lit);border:1px solid var(--brd);color:var(--t1)}
+/* 收工防误触：已「上膛」状态，需要再点一次才真收工 */
+.ck-btn.state-arm{background:var(--gold);color:var(--ink-deep);
+  box-shadow:0 0 0 2px rgba(201,168,76,.30);animation:ckArmPulse 1.2s ease-in-out infinite}
+@keyframes ckArmPulse{
+  0%,100%{box-shadow:0 0 0 2px rgba(201,168,76,.30)}
+  50%{box-shadow:0 0 0 6px rgba(201,168,76,.10)}
+}
 .ck-btn.state-done{background:rgba(143,188,168,.18);border:1px solid rgba(143,188,168,.3);
   color:var(--mint);pointer-events:none}
 

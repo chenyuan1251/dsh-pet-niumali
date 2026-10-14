@@ -541,16 +541,38 @@ function closePostcard(back){
   hidePeek();
   $pcCard.classList.add('out');
   setTimeout(()=>{ $pcOvl.classList.remove('on'); $pcCard.classList.remove('out'); }, 380);
-  if(back!==false) setTimeout(homeFromTrip, 420);
+  // 不管是用「待会儿再看」关掉，还是用 ✕ / Esc / 点背景关掉，它都得回家。
+  // 以前只有 back!==false 才回家，于是用 ✕ 关掉明信片，它就永远停在「旅途上」：
+  // 摸不到、闲聊也不轮换。homeFromTrip 自己会判断是否真在旅途中，重复调用无害。
+  setTimeout(homeFromTrip, 420);
 }
+/* 收起旅程轨道条。它只在出发时被 .add('on') 打开过，从来没有关过 ——
+   所以旅行结束、明信片收进册子之后，那条「途经 XX」的进度条会一直挂在首页上。 */
+function hideJourney(){
+  const $j=document.getElementById('journey');
+  if($j) $j.classList.remove('on');
+  const $train=document.getElementById('trainIcon');
+  if($train) $train.classList.remove('go');
+  journeyTimers.forEach(clearTimeout); journeyTimers=[];
+}
+let homeToken=0;
 function homeFromTrip(){
   if(!traveling) return;
   traveling=false; setScene('desk');
   setFace('happy');
+  hideJourney();
   setPanel('回来了','等你下次送它出发','它把远方存在册子里了','i-spark');
   setMood('回到工位了。它有点晒黑了。','happy');
   G.lastArrival=today();
   save();
+  // 「回来了」不该永远挂在首页。几秒后若没有别的事情发生，就回到待命文案。
+  const token = ++homeToken;
+  setTimeout(()=>{
+    if(token!==homeToken) return;
+    if(traveling || F.running || anyOverlay()) return;
+    if($title.textContent!=='等你下次送它出发') return;   // 这中间已经切到别的状态了，别覆盖
+    setPanel('牛马力正在待命','按住头像抚摸攒路费','每次 +1 路费 · +0.25 心情 · 攒够 100 就出发','i-paw');
+  }, 8000);
 }
 function hidePeek(){ document.getElementById('peek').classList.remove('on'); }
 
@@ -591,7 +613,7 @@ function openCollection(){
     h += `<div class="col-stat">已收集 <b>${G.collection.length}</b> / ${totalSpots} 个地点</div>`;
     h += `<div class="col-posts">${G.collection.map(item=>{
       const city=CITIES.find(c=>c.name===item.cityName);
-      return `<button class="col-post" data-city="$1" data-spot="$2">
+      return `<button class="col-post" data-city="${item.cityName}" data-spot="${item.spotName}">
         <div class="post-img"><img src="${thumb(item.spotName)}" alt="${item.spotName}"></div>
         <div class="post-cap"><span class="post-city">${item.cityName}</span><span class="post-spot">${item.spotName}</span></div>
       </button>`;
@@ -873,6 +895,7 @@ function badgeOff(){ if(F.left>=F.total) $badge.classList.remove('on'); }
 function anyOverlay(){ return document.querySelector('.ovl.on, .guide.on'); }
 addEventListener('keydown', e=>{
   if(e.key!=='Escape') return;
+  if(e.isComposing || e.keyCode===229) return;   // 用 Esc 取消拼音候选时别顺手关掉弹层
   if($fcOvl.classList.contains('on')) return closeFocus();
   if($colOvl.classList.contains('on')) return $colOvl.classList.remove('on');
   if($pcOvl.classList.contains('on')) return closePostcard(false);
@@ -899,6 +922,10 @@ document.getElementById('verTag').addEventListener('click',()=>{
 
 /* ══ v8 ══ 双打卡 + 饲料 + 手帐 ══ */
 
+/* ── 收工防误触：单击只「上膛」，再点一次才真收工 ── */
+let offArmed=false, offArmTimer=0;
+function disarmOffCheckin(){ offArmed=false; clearTimeout(offArmTimer); offArmTimer=0; updateCheckinUI(); }
+
 function updateCheckinUI(){
   const btn=document.getElementById('ckBtn');
   if(G.checkin.workDate!==today()){
@@ -906,9 +933,15 @@ function updateCheckinUI(){
     btn.innerHTML='<svg><use href="#i-check"/></svg><span>开工打卡 · 我替你守着</span>';
     btn.onclick=_=>workCheckin();
   }else if(G.checkin.offDate!==today()){
-    btn.className='ck-btn state-off btn-glass';
-    btn.innerHTML='<svg><use href="#i-check"/></svg><span>收工打卡 · 记工时</span>';
-    btn.onclick=_=>offCheckin();
+    if(offArmed){
+      btn.className='ck-btn state-arm';
+      btn.innerHTML='<svg><use href="#i-clock"/></svg><span>再点一次才收工 · 5 秒内有效</span>';
+      btn.onclick=_=>offCheckin();
+    }else{
+      btn.className='ck-btn state-off btn-glass';
+      btn.innerHTML='<svg><use href="#i-check"/></svg><span>收工打卡 · 记工时</span>';
+      btn.onclick=_=>offCheckin();
+    }
   }else{
     btn.className='ck-btn state-done';
     btn.innerHTML='<svg><use href="#i-check"/></svg><span>今日已收工 ✓</span>';
@@ -921,6 +954,8 @@ function workCheckin(){
   G.checkin.workDate=today();
   G.checkin.workStart=Date.now();
   G.feed.bag+=3;
+  // 开工时清掉可能残留的收工「上膛」，避免下一次单击直接收工
+  offArmed=false; clearTimeout(offArmTimer); offArmTimer=0;
   save(); bell('chime');
   toast('开工打卡 +3 饲料 🌾 · 开工大吉','i-ticket');
   updateCheckinUI(); stats(); setPanel('已开工','今天预计多少工时？','收工时自动算路费','i-check');
@@ -929,8 +964,22 @@ function workCheckin(){
 function offCheckin(){
   if(G.checkin.offDate===today()) return toast('今日已收工','i-check');
   if(G.checkin.workDate!==today()) return toast('今天还没开工呢','i-clock');
+  // ① 刚开工就「收工」几乎一定是连点误触：开工按钮点完会原地变成收工按钮，
+  //    双击的第二次点击正好落在它上面。直接拦掉，别把一整天的记录烧了。
+  const elapsedMin=(Date.now()-G.checkin.workStart)/60000;
+  if(elapsedMin<1) return toast('才开工不到 1 分钟，先别急着收工','i-clock');
+  // ② 两步确认：第一次点只「上膛」，5 秒内再点一次才真的收工
+  if(!offArmed){
+    offArmed=true;
+    updateCheckinUI();
+    toast('再点一次「收工」才真的收工 · 5 秒内有效','i-clock');
+    clearTimeout(offArmTimer);
+    offArmTimer=setTimeout(disarmOffCheckin, 5000);
+    return;
+  }
+  clearTimeout(offArmTimer); offArmTimer=0; offArmed=false;
   // 自动计算工时：现在 - 上班 - 1小时午休
-  const el=(Date.now()-G.checkin.workStart)/3600000 - 1;
+  const el=elapsedMin/60 - 1;
   const hours=Math.max(0.5, Math.min(16, Math.round(el*2)/2));
   confirmOffCheckin(hours);
 }
@@ -1543,7 +1592,19 @@ function boot(){
   document.getElementById('statTodo').addEventListener('click', openTodo);
   document.getElementById('tdX').addEventListener('click', closeTodo);
   document.getElementById('tdAdd').addEventListener('click', addTodo);
-  document.getElementById('tdInput').addEventListener('keydown', function(e){ if(e.key==='Enter'){ addTodo(); e.target.focus(); } });
+  /* 中文输入法：用回车「选词」不能当成「添加待办」。
+     否则打 srm 时一按回车选词，就先凭空多出一条 srm。 */
+  const $tdInput=document.getElementById('tdInput');
+  let tdComposing=false;
+  $tdInput.addEventListener('compositionstart', ()=>{ tdComposing=true; });
+  $tdInput.addEventListener('compositionend',   ()=>{ setTimeout(()=>{ tdComposing=false; }, 0); });
+  $tdInput.addEventListener('keydown', function(e){
+    if(e.key!=='Enter') return;
+    if(e.isComposing || e.keyCode===229 || tdComposing) return;   // 正在选词 → 放行给输入法
+    e.preventDefault();
+    addTodo();
+    e.target.focus();
+  });
   $tdOvl.addEventListener('mousedown', function(e){ if(e.target===this) closeTodo(); });
   // ── 打卡统计入口 ──
   document.getElementById('statCheckin').addEventListener('click', function(){ document.getElementById('ckBtn').click(); });
