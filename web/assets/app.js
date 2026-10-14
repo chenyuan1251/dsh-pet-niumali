@@ -1198,7 +1198,11 @@ function renderTodoList(){
     else if(act==='del') deleteTodo(id);
   };
 }
-function openTodo(){ renderTodoList(); document.getElementById('tdOvl').classList.add('on'); }
+/* 面板和首页那枚「N 待办」徽标必须一起刷新，否则数字会对不上：
+   以前只有 toggleTodo 顺手调了 stats()，「新加一条」和「删掉一条」
+   都不刷新首页——面板里 4 条未完成，首页还停在 2。 */
+function refreshTodos(){ renderTodoList(); stats(); }
+function openTodo(){ refreshTodos(); document.getElementById('tdOvl').classList.add('on'); }
 function closeTodo(){ document.getElementById('tdOvl').classList.remove('on'); }
 function addTodo(){
   const inp=document.getElementById('tdInput');
@@ -1208,7 +1212,7 @@ function addTodo(){
   const id=Date.now();
   G.todos.unshift({id,text,done:false,createdAt:today()});
   inp.value='';
-  save(); renderTodoList();
+  save(); refreshTodos();
 }
 function toggleTodo(id){
   const t=(G.todos||[]).find(t=>t.id===id);
@@ -1226,11 +1230,11 @@ function toggleTodo(id){
   }else{
     delete t.completedAt;
   }
-  save(); renderTodoList(); stats();
+  save(); refreshTodos();
 }
 function deleteTodo(id){
   G.todos=(G.todos||[]).filter(t=>t.id!==id);
-  save(); renderTodoList();
+  save(); refreshTodos();       // 删掉一条也要同步首页徽标
 }
 
 /* ── 今日求签 ── */
