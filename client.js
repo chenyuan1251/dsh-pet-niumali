@@ -124,10 +124,12 @@ window.__ModuleLoader__.load({
 }
 .nml-btn:hover{background:var(--dsw-alias-interactive-bg-hover,rgba(127,127,127,.14));color:var(--dsw-alias-label-primary,currentColor)}
 .nml-btn.nml-close:hover{background:rgba(220,80,80,.9);color:#fff}
-/* 📌：默认是拖动把手（光标 grab），点一下则钉住位置，钉住后整条标题栏都拖不动 */
-.nml-btn.nml-pin{cursor:grab;font-size:12px}
+/* 📌：默认是拖动把手（光标 grab），点一下则钉住位置，钉住后整条标题栏都拖不动。
+   钉住后图标换成正插着的 📍，再轻轻放大一档——斜着的钉子和钉进去的钉子
+   形状本来就不同，不用额外转角度，人家一眼就该看出这是「两种状态」。 */
+.nml-btn.nml-pin{cursor:grab;font-size:12px;transition:transform .26s cubic-bezier(.34,1.56,.64,1),background .22s,border-color .22s}
 .nml-head.nml-dragging .nml-btn.nml-pin{cursor:grabbing}
-.nml-btn.nml-pin.nml-on{background:rgba(201,168,76,.18);border-color:rgba(201,168,76,.45);color:#B08A2E}
+.nml-btn.nml-pin.nml-on{background:rgba(201,168,76,.18);border-color:rgba(201,168,76,.45);color:#B08A2E;transform:scale(1.12)}
 .nml-head.nml-pinned{cursor:default}
 .nml-head.nml-pinned .nml-btn.nml-pin{cursor:pointer}
 .nml-body{flex:1 1 auto;min-height:0;background:var(--dsw-alias-bg-base,#fff)}
@@ -571,9 +573,11 @@ window.__ModuleLoader__.load({
                 ? "已钉住 · 位置锁死，再点一下解除"
                 : "点一下钉住位置 · 按住可拖动浮窗",
               "aria-pressed": s.panelPinned ? "true" : "false",
+              "aria-label": s.panelPinned ? "已钉住，点击解除" : "钉住浮窗位置",
               onClick: togglePin,
             },
-            "📌",
+            // 斜着的 📌 = 还没钉；正插着的 📍 = 钉住了。图标自己会说状态。
+            s.panelPinned ? "📍" : "📌",
           ),
           React.createElement(
             "button",
