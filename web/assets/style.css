@@ -779,6 +779,12 @@ img{-webkit-user-drag:none;user-select:none;-webkit-user-select:none}
   font-size:.8rem;font-weight:600;border:none;cursor:pointer}
 .td-add:active{transform:scale(.95)}
 .td-empty{padding:2rem 0;text-align:center;color:var(--t3);font-size:.8rem}
+/* 「往日已归档 N 条 · 展开」：收起不等于删掉，得留个能翻旧账的口子 */
+.td-more{display:block;width:100%;margin:.4rem 0 .2rem;padding:.45rem;border:none;
+  border-radius:var(--r-sm);background:rgba(255,246,230,.04);color:var(--t3);
+  font-size:.68rem;letter-spacing:.06em;cursor:pointer;font-family:inherit;
+  transition:background .2s,color .2s}
+.td-more:hover{background:rgba(255,246,230,.08);color:var(--t1)}
 .td-item{display:flex;align-items:center;gap:.5rem;padding:.5rem .6rem;border-radius:var(--r-sm);
   cursor:pointer;transition:background .2s}
 .td-item:hover{background:rgba(255,246,230,.04)}

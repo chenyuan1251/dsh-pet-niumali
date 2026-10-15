@@ -1175,33 +1175,44 @@ function escHtml(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;')
 /* ── 待办清单 ── */
 /* 「今日待办」的口径：未完成的自动顺延到明天，往日已完成的收起。
    所以可见 = 今天建的 + 从以前顺延下来的未完成 + 今天刚划掉的。
-   createdAt 只用来标「顺延」，不作为隐藏条件——否则没做完的事会凭空消失。 */
+   createdAt 只用来标「顺延」，不作为隐藏条件——否则没做完的事会凭空消失。
+
+   收起来的条目并没有被删掉，只是没铺在面板上；底部那条「往日已归档」
+   随时能把它们摊开来看/勾/删，免得哪天想翻旧账却找不到入口。 */
+let tdShowAll=false;
+function isTodayTodo(t){ return !t.done || t.completedAt===today(); }
 function visibleTodos(){
-  return (G.todos||[]).filter(t=>!t.done || t.completedAt===today());
+  const all=G.todos||[];
+  return tdShowAll ? all : all.filter(isTodayTodo);
 }
 function renderTodoList(){
   const all=G.todos||[];
   const todos=visibleTodos();
   const done=todos.filter(t=>t.done).length;
+  const archived=all.filter(t=>!isTodayTodo(t)).length;
   const body=document.getElementById('tdBody');
   document.getElementById('tdSub').textContent=done+' / '+todos.length+' 已完成';
-  if(!todos.length){
-    body.innerHTML='<div class="td-empty">'+(all.length
-      ? '今天的都清空了<br><span class="td-tag">往日完成的已收起来</span>'
-      : '还没有待办<br><span class="td-tag">在下方输入添加</span>')+'</div>';
-    return;
-  }
-  body.innerHTML=todos.map(t=>{
-    const carried=!t.done && !!t.createdAt && t.createdAt!==today();
-    return '<div class="td-item" data-id="'+t.id+'">'+
-      '<div class="td-check'+(t.done?' done':'')+'" data-act="toggle"></div>'+
-      '<span class="td-text'+(t.done?' done':'')+'">'+escHtml(t.text)+'</span>'+
-      (carried?'<span class="td-tag td-carry">顺延</span>':'')+
-      '<button class="td-del" data-act="del">✕</button>'+
-    '</div>';
-  }).join('');
-  // 事件委托
+  const more=archived
+    ? '<button class="td-more" data-act="more">'+(tdShowAll
+        ? '收起往日已完成的 '+archived+' 条'
+        : '往日已归档 '+archived+' 条 · 展开')+'</button>'
+    : '';
+  body.innerHTML=(todos.length
+    ? todos.map(t=>{
+        const carried=!t.done && !!t.createdAt && t.createdAt!==today();
+        return '<div class="td-item" data-id="'+t.id+'">'+
+          '<div class="td-check'+(t.done?' done':'')+'" data-act="toggle"></div>'+
+          '<span class="td-text'+(t.done?' done':'')+'">'+escHtml(t.text)+'</span>'+
+          (carried?'<span class="td-tag td-carry">顺延</span>':'')+
+          '<button class="td-del" data-act="del">✕</button>'+
+        '</div>';
+      }).join('')
+    : '<div class="td-empty">'+(all.length
+        ? '今天的都清空了<br><span class="td-tag">往日完成的已收起来</span>'
+        : '还没有待办<br><span class="td-tag">在下方输入添加</span>')+'</div>')+more;
+  // 事件委托：空态也要挂上，否则会留上一次渲染的闭包在里面。
   body.onclick=function(e){
+    if(e.target.closest('.td-more')){ tdShowAll=!tdShowAll; renderTodoList(); return; }
     const item=e.target.closest('.td-item');
     if(!item) return;
     const id=parseInt(item.dataset.id);
