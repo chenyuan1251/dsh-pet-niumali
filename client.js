@@ -320,7 +320,9 @@ window.__ModuleLoader__.load({
           if (s.moved) {
             if (cfgRef.current.onDrop) cfgRef.current.onDrop();
           } else if (allowTap && cfgRef.current.onTap) {
-            cfgRef.current.onTap(e);
+            // 把「按下时真正点在谁身上」一起交回去。指针一旦被标题栏捕获，
+            // e.target 就只剩标题栏本身了，靠它分不出点的是钉子还是空白。
+            cfgRef.current.onTap(e, s.downTarget);
           }
         }
         return {
@@ -330,7 +332,11 @@ window.__ModuleLoader__.load({
             // 钉住时整块都拖不动：不是拖到一半才拒绝，而是压根不开始。
             if (cfgRef.current.canStart && !cfgRef.current.canStart()) return;
             const start = cfgRef.current.getStart();
-            ref.current = { px: e.clientX, py: e.clientY, start, moved: false, id: e.pointerId };
+            ref.current = {
+              px: e.clientX, py: e.clientY, start, moved: false, id: e.pointerId,
+              // 先记下落点：setPointerCapture 之后 target 会被改写成捕获元素
+              downTarget: e.target,
+            };
             try {
               e.currentTarget.setPointerCapture(e.pointerId);
             } catch (_) {}
@@ -506,6 +512,9 @@ window.__ModuleLoader__.load({
       // 刚拖完的那一下别再当成「点击」：松手后浏览器还会补一个 click，
       // 不拦的话拖完浮窗会顺手把钉子按反。
       const dragEndAt = React.useRef(0);
+      // 同一次点击可能两条通路都到（没被捕获时 click 落到按钮上，被捕获时只剩 onTap），
+      // 去重，否则一下点击会把钉子翻两次、看起来像没反应。
+      const pinAt = React.useRef(0);
 
       const handlers = useDrag({
         // 钉住 = 位置锁死，整块标题栏都不再响应拖动。
@@ -525,11 +534,21 @@ window.__ModuleLoader__.load({
           store.set({ panelDragging: false });
           localStorage_set(LS_PANEL, store.get().panel);
         },
+        // 标题栏用 setPointerCapture 接管了指针，随后那次 click 会被浏览器改派到
+        // 标题栏本身，钉子自己的 onClick 根本收不到 —— 所以「点了一下钉子」这件事
+        // 只能在这里补判一次：落点是不是钉子，在 pointerdown 时就记下来了。
+        onTap: (e, downTarget) => {
+          if (downTarget && downTarget.closest && downTarget.closest(".nml-btn.nml-pin"))
+            togglePin();
+        },
       });
 
       // 这一下到底是「点钉子」还是「拖浮窗」收尾？位移算过拖动，就用时间戳挡掉随后的 click。
       function togglePin() {
-        if (Date.now() - dragEndAt.current < 300) return;
+        const now = Date.now();
+        if (now - dragEndAt.current < 300) return;   // 这是拖动收尾，不是点击
+        if (now - pinAt.current < 250) return;       // 同一个按事件已经处理过了
+        pinAt.current = now;
         const next = !store.get().panelPinned;
         store.set({ panelPinned: next });
         lsSet(LS_PIN, next ? "1" : "0");
