@@ -822,21 +822,12 @@ window.__ModuleLoader__.load({
             "重置",
           ),
         ),
+        // 这里原来挂着一个 <a target="_blank">打开 ↗</a>。DSH 桌面端不接管
+        // setWindowOpenHandler，「请求开新窗口」就被静默丢弃：不报错、也不跳转，
+        // 点了跟没点一样。设置页里要开桌宠，用上面那个「常驻浮球」开关就够了。
         Row(
           "当前存档",
           "路费 " + fare + " · 浮球徽标读的就是这份存档（同源 localStorage）。",
-          React.createElement(
-            "a",
-            {
-              className: "nml-btn",
-              href: PET_PAGE,
-              target: "_blank",
-              rel: "noreferrer",
-              title: "在新标签页打开牛马力",
-              style: { width: "auto", padding: "6px 12px" },
-            },
-            "打开 ↗",
-          ),
         ),
       );
     }
