@@ -125,11 +125,14 @@ window.__ModuleLoader__.load({
 .nml-btn:hover{background:var(--dsw-alias-interactive-bg-hover,rgba(127,127,127,.14));color:var(--dsw-alias-label-primary,currentColor)}
 .nml-btn.nml-close:hover{background:rgba(220,80,80,.9);color:#fff}
 /* 📌：默认是拖动把手（光标 grab），点一下则钉住位置，钉住后整条标题栏都拖不动。
-   钉住后图标换成正插着的 📍，再轻轻放大一档——斜着的钉子和钉进去的钉子
-   形状本来就不同，不用额外转角度，人家一眼就该看出这是「两种状态」。 */
-.nml-btn.nml-pin{cursor:grab;font-size:12px;transition:transform .26s cubic-bezier(.34,1.56,.64,1),background .22s,border-color .22s}
+   钉住 / 没钉住的差别必须一眼可见，所以做三重区分：
+   斜着的灰钉子 → 正过来的彩钉子。只换 emoji 不够 —— 📌 和 📍 在 12px 上
+   本来就有点像，朝向、饱和度、底色一起变才认得出来。 */
+.nml-btn.nml-pin{cursor:grab;font-size:12px;opacity:.6;transform:rotate(-22deg);
+  transition:transform .28s cubic-bezier(.34,1.56,.64,1),opacity .22s,background .22s,border-color .22s}
 .nml-head.nml-dragging .nml-btn.nml-pin{cursor:grabbing}
-.nml-btn.nml-pin.nml-on{background:rgba(201,168,76,.18);border-color:rgba(201,168,76,.45);color:#B08A2E;transform:scale(1.12)}
+.nml-btn.nml-pin.nml-on{opacity:1;transform:rotate(0deg) scale(1.18);
+  background:rgba(201,168,76,.24);border-color:rgba(201,168,76,.6);color:#B08A2E}
 .nml-head.nml-pinned{cursor:default}
 .nml-head.nml-pinned .nml-btn.nml-pin{cursor:pointer}
 .nml-body{flex:1 1 auto;min-height:0;background:var(--dsw-alias-bg-base,#fff)}
