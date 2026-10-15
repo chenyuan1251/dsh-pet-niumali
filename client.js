@@ -40,6 +40,7 @@ window.__ModuleLoader__.load({
     const LS_BALL = PLUGIN_ID + ":ball";
     const LS_PANEL = PLUGIN_ID + ":panel";
     const LS_VISIBLE = PLUGIN_ID + ":visible";
+    const LS_PIN = PLUGIN_ID + ":pin";
 
     const BALL_SIZE = 62;
     const PANEL_W = 400;
@@ -123,9 +124,12 @@ window.__ModuleLoader__.load({
 }
 .nml-btn:hover{background:var(--dsw-alias-interactive-bg-hover,rgba(127,127,127,.14));color:var(--dsw-alias-label-primary,currentColor)}
 .nml-btn.nml-close:hover{background:rgba(220,80,80,.9);color:#fff}
-/* 📌 把手：光标跟着标题栏一起变，别让 pointer 光标误导人以为这儿只能点 */
+/* 📌：默认是拖动把手（光标 grab），点一下则钉住位置，钉住后整条标题栏都拖不动 */
 .nml-btn.nml-pin{cursor:grab;font-size:12px}
 .nml-head.nml-dragging .nml-btn.nml-pin{cursor:grabbing}
+.nml-btn.nml-pin.nml-on{background:rgba(201,168,76,.18);border-color:rgba(201,168,76,.45);color:#B08A2E}
+.nml-head.nml-pinned{cursor:default}
+.nml-head.nml-pinned .nml-btn.nml-pin{cursor:pointer}
 .nml-body{flex:1 1 auto;min-height:0;background:var(--dsw-alias-bg-base,#fff)}
 .nml-frame{width:100%;height:100%;border:0;display:block}
 /* 关掉但保持挂载时只隐藏，不打碎 iframe —— 桌宠的专注计时不能因为收起浮窗就断掉 */
@@ -318,6 +322,8 @@ window.__ModuleLoader__.load({
           onPointerDown(e) {
             // 只认左键；右键留给 contextmenu
             if (e.pointerType === "mouse" && e.button !== 0) return;
+            // 钉住时整块都拖不动：不是拖到一半才拒绝，而是压根不开始。
+            if (cfgRef.current.canStart && !cfgRef.current.canStart()) return;
             const start = cfgRef.current.getStart();
             ref.current = { px: e.clientX, py: e.clientY, start, moved: false, id: e.pointerId };
             try {
@@ -492,7 +498,13 @@ window.__ModuleLoader__.load({
         if (s.open && !everOpened) setEverOpened(true);
       }, [s.open, everOpened]);
 
+      // 刚拖完的那一下别再当成「点击」：松手后浏览器还会补一个 click，
+      // 不拦的话拖完浮窗会顺手把钉子按反。
+      const dragEndAt = React.useRef(0);
+
       const handlers = useDrag({
+        // 钉住 = 位置锁死，整块标题栏都不再响应拖动。
+        canStart: () => !store.get().panelPinned,
         getStart: () => store.get().panel,
         onMove: ({ dx, dy, start }) =>
           store.set({
@@ -504,13 +516,25 @@ window.__ModuleLoader__.load({
             panelDragging: true,
           }),
         onDrop: () => {
+          dragEndAt.current = Date.now();
           store.set({ panelDragging: false });
           localStorage_set(LS_PANEL, store.get().panel);
         },
       });
 
+      // 这一下到底是「点钉子」还是「拖浮窗」收尾？位移算过拖动，就用时间戳挡掉随后的 click。
+      function togglePin() {
+        if (Date.now() - dragEndAt.current < 300) return;
+        const next = !store.get().panelPinned;
+        store.set({ panelPinned: next });
+        lsSet(LS_PIN, next ? "1" : "0");
+      }
+
       const h = panelHeight();
-      const headCls = s.panelDragging ? "nml-head nml-dragging" : "nml-head";
+      const headCls =
+        "nml-head" +
+        (s.panelDragging ? " nml-dragging" : "") +
+        (s.panelPinned ? " nml-pinned" : "");
       const streak = pet && pet.checkin && pet.checkin.streak ? pet.checkin.streak : 0;
 
       return React.createElement(
@@ -532,13 +556,23 @@ window.__ModuleLoader__.load({
             ? React.createElement("span", { className: "nml-chip" }, "连续 " + streak + " 天")
             : null,
           React.createElement("span", { className: "nml-spacer" }),
-          // 📌 是浮窗的「把手」：按住它（或标题栏任意空白处）就能拖动浮窗。
-          // 这里刻意不 stopPropagation —— 它本身就是拖动区的一部分。
-          // 老版本把它做成了一个 <a href target="_blank"> 的 ↗：在 DSH 桌面端
-          // 新窗口请求没人接管，点了没反应，还让人以为这一块不能拖。
+          // 📌 是浮窗的把手，也是一个开关：按住能拖，点一下钉住位置。
+          // 这里刻意不 stopPropagation —— 指针要能冒泡到标题栏，拖动才接得上；
+          // 是「点」还是「拖」由 useDrag 的位移死区决定，拖动收尾的那次 click
+          // 再用 dragEndAt 挡掉，所以不会拖完顺手把钉子按反。
+          // 老版本把它做成了一个 <a href target="_blank"> 的 ↗：DSH 桌面端没人接管
+          // 新窗口请求，点了没反应，还让人以为这一块不能拖。
           React.createElement(
-            "span",
-            { className: "nml-btn nml-pin", title: "按住这里拖动浮窗" },
+            "button",
+            {
+              type: "button",
+              className: s.panelPinned ? "nml-btn nml-pin nml-on" : "nml-btn nml-pin",
+              title: s.panelPinned
+                ? "已钉住 · 位置锁死，再点一下解除"
+                : "点一下钉住位置 · 按住可拖动浮窗",
+              "aria-pressed": s.panelPinned ? "true" : "false",
+              onClick: togglePin,
+            },
             "📌",
           ),
           React.createElement(
@@ -789,6 +823,8 @@ window.__ModuleLoader__.load({
       panel: defaultPanelPos(),
       open: lsGet(LS_PANEL_OPEN_FLAG, "0") === "1",
       visible: lsGet(LS_VISIBLE, "1") !== "0",
+      /** 钉住：浮窗位置锁死，标题栏不再响应拖动。 */
+      panelPinned: lsGet(LS_PIN, "0") === "1",
       ballDragging: false,
       panelDragging: false,
     });
