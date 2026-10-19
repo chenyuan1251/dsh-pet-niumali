@@ -1,6 +1,6 @@
 {
   "name": "dsh-pet-niumali",
-  "version": "8.0.1",
+  "version": "8.0.2",
   "description": "牛马力 v8：DSH 界面里的常驻桌宠浮球，点开是开工/收工打卡、专注计时、待办、手帐、旅行与探宝的生活闭环。",
   "type": "module",
   "main": "index.mjs",

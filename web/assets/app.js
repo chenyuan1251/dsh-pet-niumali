@@ -982,9 +982,10 @@ function offCheckin(){
   // 双击的第二次点击正好落在它上面。直接拦掉，别把一整天的记录烧了。
   const elapsedMin=(Date.now()-G.checkin.workStart)/60000;
   if(elapsedMin<1) return toast('才开工不到 1 分钟，先别急着收工','i-clock');
-  // 自动计算工时：现在 - 上班 - 1小时午休
-  const el=elapsedMin/60 - 1;
-  const hours=Math.max(0.5, Math.min(16, Math.round(el*2)/2));
+  // 自动计算工时：现在 - 上班；只有工作满 4 小时才扣 1 小时午休
+  const elapsedHours=elapsedMin/60;
+  const lunchDeduction=elapsedHours>=4 ? 1 : 0;
+  const hours=Math.max(0.5, Math.min(16, Math.round((elapsedHours-lunchDeduction)*2)/2));
   askOffCheckin(hours);   // 先把工时和它的表情摊开给你看，确认了才真收工
 }
 
